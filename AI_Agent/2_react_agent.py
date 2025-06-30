@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 import os
 
 # ✅ Import message types used in LangChain & LangGraph
-from langchain_core.messages import BaseMessage, SystemMessage, ToolMessage
+from langchain_core.messages import BaseMessage, SystemMessage, ToolMessage,HumanMessage,AIMessage
 
 # ✅ Import OpenAI chat model and LangGraph components
 from langchain_openai import ChatOpenAI
@@ -90,3 +90,26 @@ graph.add_edge("tools", "our_agent")
 
 # ✅ Compile the graph into an executable agent
 app = graph.compile()
+
+
+# 🧪 Test input
+input_state = {
+    "messages": [HumanMessage(content="What is 2 - 3 , 25+9 and 200+2000?")]
+}
+
+# 🚀 Invoke the graph
+final_state = app.invoke(input_state)  # type: ignore
+
+# 📦 Print the final state, including tool call info if used
+print("\nFinal Agent Response:")
+for msg in final_state["messages"]:
+    if isinstance(msg, AIMessage):
+        print("AI:", msg.content)
+        # If AI is calling a tool, show tool call info
+        if msg.tool_calls:
+            for tool_call in msg.tool_calls:
+                print(f"🔧 Tool Call → Tool: {tool_call['name']}, Args: {tool_call['args']}")
+    elif isinstance(msg, ToolMessage):
+        print(f"🛠️ Tool Result: {msg.content}")
+    else:
+        print(f"{msg.type.capitalize()}: {msg.content}")
