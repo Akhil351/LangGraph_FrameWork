@@ -29,8 +29,25 @@ def add(a: int, b: int) -> int:
     """Adds two integers and returns the result."""
     return a + b
 
+@tool
+def sub(a: int, b: int) -> int:
+    """Subtracts b from a and returns the result."""
+    return a - b
+
+@tool
+def mult(a: int, b: int) -> int:
+    """Multiplies two integers and returns the result."""
+    return a * b
+
+@tool
+def div(a: int, b: int) -> float:
+    """Divides a by b and returns the result as a float."""
+    if b == 0:
+        raise ValueError("Cannot divide by zero.")
+    return a / b
+
 # 🔧 Register tools that the LLM is allowed to call
-tools = [add]
+tools = [add,sub,mult,div]
 
 # 🤖 Initialize the OpenAI model and bind the available tools to it
 model = ChatOpenAI(
@@ -92,9 +109,11 @@ graph.add_edge("tools", "our_agent")
 app = graph.compile()
 
 
+user_input = input("You: ")
+
 # 🧪 Test input
 input_state = {
-    "messages": [HumanMessage(content="What is 2 - 3 , 25+9 and 200+2000?")]
+    "messages": [HumanMessage(content=user_input)]  # Start with the user's message
 }
 
 # 🚀 Invoke the graph
